@@ -15,7 +15,7 @@ describe('Chat Service', () => {
   });
 
   it('should fetch a chat response from OpenAI API', async function() {
-    this.timeout(20000); // Ajout d'un timeout de 5 secondes
+    this.timeout(20000); // Ajout d'un timeout 
 
     const messages = [
       { role: 'system', content: 'You are a football coach assistant.' },
