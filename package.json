@@ -1,5 +1,6 @@
 {
   "name": "coachbot",
+  "type": "module",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
@@ -7,11 +8,17 @@
     "backend"
   ],
   "scripts": {
+    "test": "mocha",
     "install-all": "npm install --prefix frontend && npm install --prefix backend",
     "start": "concurrently \"npm run start --prefix frontend\" \"npm run dev --prefix backend\""
   },
   "devDependencies": {
-    "concurrently": "^6.0.0"
+    "axios-mock-adapter": "^1.22.0",
+    "chai": "^5.1.1",
+    "concurrently": "^6.0.0",
+    "mocha": "^10.6.0",
+    "puppeteer": "^22.13.1",
+    "supertest": "^7.0.0"
   },
   "dependencies": {
     "cors": "^2.8.5"
