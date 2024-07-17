@@ -1,0 +1,19 @@
+{
+  "name": "coachbot",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install-all": "npm install --prefix frontend && npm install --prefix backend",
+    "start": "concurrently \"npm run start --prefix frontend\" \"npm run dev --prefix backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^6.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
+}
