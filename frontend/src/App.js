@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { apiCall } from './api';
 import './styles/styles.css';
 
 const App = () => {
@@ -17,8 +17,8 @@ const App = () => {
     const updatedMessages = [...messages, newMessage];
 
     try {
-      const res = await axios.post('http://localhost:3000/api/chat', { messages: updatedMessages });
-      const assistantMessage = { role: 'assistant', content: res.data.message };
+      const response = await apiCall('/chat', 'POST', { messages: updatedMessages });
+      const assistantMessage = { role: 'assistant', content: response.message };
       setMessages([...updatedMessages, assistantMessage]);
       setMessage('');
     } catch (error) {
@@ -28,8 +28,8 @@ const App = () => {
 
   const handleSaveScore = async () => {
     try {
-      const res = await axios.post('http://localhost:3000/api/scores', { score, mood, domicile, adversaire });
-      alert(res.data.message);
+      const response = await apiCall('/scores', 'POST', { score, mood, domicile, adversaire });
+      alert(response.message);
     } catch (error) {
       console.error(error);
     }
