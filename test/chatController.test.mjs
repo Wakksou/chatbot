@@ -4,6 +4,14 @@ import bodyParser from 'body-parser';
 import routes from '../backend/src/routes/index.js';
 import supertest from 'supertest';
 import mysql from 'mysql2';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+console.log('MYSQL_HOST:', process.env.MYSQL_HOST);
+console.log('MYSQL_USER:', process.env.MYSQL_USER);
+console.log('MYSQL_PASSWORD:', process.env.MYSQL_PASSWORD);
+console.log('MYSQL_DATABASE:', process.env.MYSQL_DATABASE);
 
 describe('Chat Controller', () => {
   let app, request, db;
