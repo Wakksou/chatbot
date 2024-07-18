@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { apiCall } from './api';
 import './styles/styles.css';
-import aiProfilePic from './assets/ai_profile.jpg'; // Assurez-vous que le chemin est correct
+import aiProfilePic from './assets/ai_profile.jpg'; 
 
 const App = () => {
   const [message, setMessage] = useState('');

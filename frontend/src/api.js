@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-const apiUrl = 'http://localhost:3000/api'; // URL de base de votre API
+const apiUrl = 'http://localhost:3000/api'; 
 
 /**
  * Fonction centrale pour effectuer des appels API
- * @param {string} endpoint - Le point de terminaison de l'API (e.g., '/chat' ou '/scores')
- * @param {string} method - La méthode HTTP à utiliser (e.g., 'POST', 'GET')
- * @param {object} data - Les données à envoyer avec la requête (le cas échéant)
- * @returns {Promise} - Une promesse contenant la réponse de l'API
+ * @param {string} endpoint 
+ * @param {string} method 
+ * @param {object} data 
+ * @returns {Promise} 
  */
 export const apiCall = async (endpoint, method, data = null) => {
   try {
