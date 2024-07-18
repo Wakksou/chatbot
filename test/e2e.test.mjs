@@ -1,32 +1,64 @@
-import puppeteer from 'puppeteer';
 import { expect } from 'chai';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import mysql from 'mysql2/promise';
+import { fetchChatResponse } from '../backend/src/services/chatService.js';
+import dotenv from 'dotenv';
 
-describe('End-to-End Tests', () => {
-  let browser, page;
+
+dotenv.config();
+
+
+describe('Chat Service', () => {
+  let mock;
+  let db;
 
   before(async function() {
-    this.timeout(20000); // Ajout d'un timeout de 10 secondes
-    browser = await puppeteer.launch({ headless: false });
-    page = await browser.newPage();
-    await page.goto('http://localhost:3001'); // Assurez-vous que le serveur frontend est en cours d'exécution
+    this.timeout(10000); 
+    mock = new MockAdapter(axios);
+
+
+    db = await mysql.createConnection({
+      host: process.env.MYSQL_HOST,
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE
+    });
+
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS reponse (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_message TEXT NOT NULL,
+        assistant_response TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
   });
 
   after(async () => {
-    await browser.close();
+    await db.execute('DROP TABLE IF EXISTS reponse');
+    await db.end();
+    mock.restore();
   });
 
-  it('should send a message and receive a response', async function() {
-    this.timeout(20000); // Ajout d'un timeout de 20 secondes
+  it('should fetch a chat response from OpenAI API', async function() {
+    this.timeout(20000); 
+    const messages = [
+      { role: 'system', content: 'You are a football coach assistant.' },
+      { role: 'user', content: 'Give me some football tactics' }
+    ];
 
-    await page.type('textarea', 'Give me some football tactics');
-    await page.click('button');
+    mock.onPost('https://api.openai.com/v1/chat/completions').reply(200, {
+      choices: [
+        {
+          message: {
+            content: 'Certainly! Here are some common football tactics that teams often use: ...'
+          }
+        }
+      ]
+    });
 
-    // Attendre que la réponse soit affichée
-    await page.waitForSelector('p', { timeout: 20000 });
-
-    const responseText = await page.$$eval('p', elements => elements.map(el => el.textContent));
-    const assistantResponse = responseText.find(text => text.includes('Assistant:'));
-
-    expect(assistantResponse).to.exist; // Vérifiez que la réponse de l'assistant est présente
+    const response = await fetchChatResponse(messages, db);
+    expect(response.advice).to.include('football'); // Il attend ce mot la forcément inclus dans la réponse
   });
 });

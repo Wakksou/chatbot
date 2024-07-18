@@ -3,8 +3,10 @@ const dotenv = require('dotenv');
 const mysql = require('mysql2');
 const cors = require('cors');
 const routes = require('./routes/index');
+const path = require('path'); 
 
-dotenv.config();
+// Chargez le fichier .env
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,6 +25,8 @@ db.connect((err) => {
     console.log('Connected to MySQL');
   }
 });
+
+app.locals.db = db; // Pass the db connection to app locals
 
 app.use(cors());
 app.use(express.json());

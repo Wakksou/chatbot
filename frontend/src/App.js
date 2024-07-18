@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { apiCall } from './api';
 import './styles/styles.css';
+import aiProfilePic from './assets/ai_profile.jpg'; 
 
 const App = () => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
-    { role: 'system', content: 'You are a football coach assistant.' }
+    { role: 'system', content: 'Tu es un coach senior de football. Réponds comme si tu communiquais avec ton élève et considère toi comme faisant partie de son equipe.'  }
   ]);
   const [score, setScore] = useState('');
   const [mood, setMood] = useState('');
@@ -17,8 +18,8 @@ const App = () => {
     const updatedMessages = [...messages, newMessage];
 
     try {
-      const res = await axios.post('http://localhost:3000/api/chat', { messages: updatedMessages });
-      const assistantMessage = { role: 'assistant', content: res.data.message };
+      const response = await apiCall('/chat', 'POST', { messages: updatedMessages });
+      const assistantMessage = { role: 'assistant', content: response.message };
       setMessages([...updatedMessages, assistantMessage]);
       setMessage('');
     } catch (error) {
@@ -28,94 +29,73 @@ const App = () => {
 
   const handleSaveScore = async () => {
     try {
-      const res = await axios.post('http://localhost:3000/api/scores', { score, mood, domicile, adversaire });
-      alert(res.data.message);
+      const response = await apiCall('/scores', 'POST', { score, mood, domicile, adversaire });
+      alert(response.message);
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
+    <div className="container">
       <h1>Football Coach Bot</h1>
-      <div style={{ marginBottom: '10px' }}>
-        <textarea
-          placeholder="Enter your message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          rows="4"
-          style={{ width: '100%', padding: '10px', fontSize: '16px' }}
-        />
-      </div>
-      <div>
-        <button
-          onClick={handleSendMessage}
-          style={{ width: '100%', padding: '10px', fontSize: '16px', cursor: 'pointer' }}
-        >
-          Send Message
-        </button>
-      </div>
-      <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
-        <h2>Conversation History:</h2>
-        <div>
+      <div className="chat-container">
+        <div className="messages">
           {messages
-            .filter(msg => msg.role !== 'system') // Filtrer les messages du système
+            .filter(msg => msg.role !== 'system')
             .map((msg, index) => (
-              <p key={index} style={{ color: msg.role === 'user' ? 'blue' : 'green' }}>
-                <strong>{msg.role === 'user' ? 'User: ' : 'Assistant: '}</strong>
-                {msg.content}
-              </p>
+              <div key={index} className={`message ${msg.role}`}>
+                {msg.role === 'assistant' && (
+                  <div className="profile-pic">
+                    <img src={aiProfilePic} alt="AI" />
+                  </div>
+                )}
+                <div className="message-content">
+                  <strong>{msg.role === 'user' ? 'You: ' : 'Coach: '}</strong>
+                  {msg.content}
+                </div>
+              </div>
             ))}
         </div>
+        <div className="input-container">
+          <textarea
+            placeholder="Enter your message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows="2"
+          />
+          <button onClick={handleSendMessage}>Send</button>
+        </div>
       </div>
-      <div style={{ marginTop: '20px' }}>
+      <div className="save-score">
         <h2>Save Match Score</h2>
-        <div style={{ marginBottom: '10px' }}>
+        <input
+          type="text"
+          placeholder="Score"
+          value={score}
+          onChange={(e) => setScore(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Mood"
+          value={mood}
+          onChange={(e) => setMood(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Adversaire"
+          value={adversaire}
+          onChange={(e) => setAdversaire(e.target.value)}
+        />
+        <label>
+          Domicile:
           <input
-            type="text"
-            placeholder="Score"
-            value={score}
-            onChange={(e) => setScore(e.target.value)}
-            style={{ width: '100%', padding: '10px', fontSize: '16px' }}
+            type="checkbox"
+            checked={domicile}
+            onChange={(e) => setDomicile(e.target.checked)}
           />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            placeholder="Mood"
-            value={mood}
-            onChange={(e) => setMood(e.target.value)}
-            style={{ width: '100%', padding: '10px', fontSize: '16px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            placeholder="Adversaire"
-            value={adversaire}
-            onChange={(e) => setAdversaire(e.target.value)}
-            style={{ width: '100%', padding: '10px', fontSize: '16px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <label>
-            Domicile:
-            <input
-              type="checkbox"
-              checked={domicile}
-              onChange={(e) => setDomicile(e.target.checked)}
-              style={{ marginLeft: '10px' }}
-            />
-          </label>
-        </div>
-        <div>
-          <button
-            onClick={handleSaveScore}
-            style={{ width: '100%', padding: '10px', fontSize: '16px', cursor: 'pointer' }}
-          >
-            Save Score
-          </button>
-        </div>
+        </label>
+        <button onClick={handleSaveScore}>Save Score</button>
       </div>
     </div>
   );
